@@ -1,0 +1,29 @@
+FROM docker:latest
+
+# Docker Daemon을 컨테이너 내에서 실행하기 위한 환경 설정
+RUN apk add --no-cache docker-cli curl bash ufw sudo
+
+RUN curl -L "https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+RUN chmod +x /usr/local/bin/docker-compose
+
+
+# Docker와 Docker Compose 버전 확인
+RUN docker --version && docker-compose --version
+
+
+# 작업 디렉터리 설정
+WORKDIR /source
+
+# 필요한 파일을 복사합니다.
+COPY . .
+
+EXPOSE 80
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# ENTRYPOINT로 스크립트를 설정
+ENTRYPOINT ["/entrypoint.sh"]
+
+# docker build -f Dockerfile.deploy -t lim_image .
+# docker run --privileged -p 80:80 -d --name lim_container lim_image:latest
